@@ -77,7 +77,7 @@ def image_stats(image):
     return (bMean, bStd, gMean, gStd, rMean, rStd)
 
 
-def hist_dist(source, target, i):
+def hist_dist(source, target, i_th):
     # build histgram
     h_bins = 50
     s_bins = 60
@@ -86,17 +86,22 @@ def hist_dist(source, target, i):
     h_ranges = [0, 180]
     s_ranges = [0, 256]
     ranges = h_ranges + s_ranges  # concat lists
-    # Use the 0-th and 1-st channels
-    # channels = [0, 1, 2]
 
-    list_haha
-    color = ('blue', 'green', 'red')
     # Correlation distance
+    color = ('blue', 'green', 'red')
+    fun_name = "Correlation Distance"
+
     for i, col in enumerate(color):
+
+        list_trans_sou = []
+        list_trans_tar = []
+        list_diff = []
+
         for weight in range(101):
             # build img_trans
             img_trans = color_transfer(source, target, weight)
 
+            # build histgram
             hist_transfer = cv2.calcHist(
                 [img_trans], [i], None, histSize, ranges, accumulate=False)
             cv2.normalize(hist_transfer, hist_transfer, alpha=0,
@@ -112,24 +117,36 @@ def hist_dist(source, target, i):
             cv2.normalize(hist_target, hist_target, alpha=0,
                           beta=1, norm_type=cv2.NORM_MINMAX)
 
+            # compare histgram
             trans_sou = cv2.compareHist(
                 hist_transfer, hist_source, cv2.HISTCMP_CORREL)
             trans_tar = cv2.compareHist(
                 hist_transfer, hist_target, cv2.HISTCMP_CORREL)
+            # difference
             diff = abs(trans_sou - trans_tar)
 
-            # write in excel file
-            ###########################################################excel_W("Correlation Distance", col, weight, trans_sou, trans_tar, diff, i)
+            #append in list
+            list_trans_sou.append(trans_sou)
+            list_trans_tar.append(trans_tar)
+            list_diff.append(diff)
+
+        # write in excel file
+        excel_W(fun_name, col, list_trans_sou, list_trans_tar, list_diff, i_th)
 
 
-def excel_W(fun_name, color, weight, trans_sou, trans_tar, diff, i):
+def excel_W(fun_name, color, trans_sou, trans_tar, diff, i_th):
+
     dir_dis1 = "distance-XXX/"
-    dir_path = dir_dis1 + "res-0" + i + "-" + color + ".csv"
+    dir_path = dir_dis1 + "res-0" + i_th + "-" + color + ".csv"
 
     with open(dir_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(fun_name)
         writer.writerow(["NO", "Weight", "D(S, Iw)", "D(T, Iw)", "Difference"])
+
+        for i in range(101):
+            writer.writerow(
+                [(i+1), (0.01*i), trans_sou[i], trans_tar[i], diff[i]])
 
 
 if __name__ == "__main__":
