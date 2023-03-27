@@ -79,6 +79,7 @@ def image_stats(image):
 
 def hist_dist(source, target, i_th):
     # build histgram
+
     h_bins = 50
     s_bins = 60
     histSize = [h_bins, s_bins]
@@ -96,6 +97,7 @@ def hist_dist(source, target, i_th):
         list_trans_sou = []
         list_trans_tar = []
         list_diff = []
+        list_best_wei = []
 
         for weight in range(101):
             # build img_trans
@@ -132,6 +134,11 @@ def hist_dist(source, target, i_th):
 
         # write in excel file
         excel_W(fun_name, col, list_trans_sou, list_trans_tar, list_diff, i_th)
+        # find out the best weight
+        list_best_wei.append(min(list_diff))
+
+    # build wct img
+    create_wctimg(source, target, list_best_wei, i_th)
 
 
 def excel_W(fun_name, color, trans_sou, trans_tar, diff, i_th):
@@ -147,6 +154,10 @@ def excel_W(fun_name, color, trans_sou, trans_tar, diff, i_th):
         for i in range(101):
             writer.writerow(
                 [(i+1), (0.01*i), trans_sou[i], trans_tar[i], diff[i]])
+
+
+def create_wctimg(source, target, list_best_wei, i_th):
+    i = 0
 
 
 if __name__ == "__main__":
