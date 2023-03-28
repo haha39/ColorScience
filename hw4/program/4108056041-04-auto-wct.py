@@ -89,62 +89,74 @@ def hist_dist(source, target, i_th):
     # ranges = h_ranges + s_ranges  # concat lists
 
     # Correlation distance
-    color = ('blue', 'green', 'red')
-    fun_name = "Correlation Distance"
+    color = ("blue", "green", "red")
+
+    hist_com = (cv2.HISTCMP_CORREL, cv2.HISTCMP_CHISQR,
+                cv2.HISTCMP_INTERSECT, cv2.HISTCMP_BHATTACHARYYA)
+
+    fun_name = ["Correlation Distance", "Chi-Square Distance",
+                "Intersection Distance", "Bhattacharyya Distance"]
+
+    dir_name = ["COR", "CHS", "INS", "BHA"]
+
     list_best_wei = []
 
-    for i, col in enumerate(color):
+    for j, method in enumerate(hist_com):
 
-        list_trans_sou = []
-        list_trans_tar = []
-        list_diff = []
+        for i, col in enumerate(color):
 
-        for weight in range(101):
-            # build img_trans
-            img_trans = color_transfer(source, target, weight)
+            list_trans_sou = []
+            list_trans_tar = []
+            list_diff = []
 
-            # build histgram
-            hist_transfer = cv2.calcHist(
-                [img_trans], [i], None, [256], [0, 256])
-            cv2.normalize(hist_transfer, hist_transfer, alpha=0,
-                          beta=1, norm_type=cv2.NORM_MINMAX)
+            for weight in range(101):
 
-            hist_source = cv2.calcHist(
-                [source], [i], None, [256], [0, 256])
-            cv2.normalize(hist_source, hist_source, alpha=0,
-                          beta=1, norm_type=cv2.NORM_MINMAX)
+                # build img_trans
+                img_trans = color_transfer(source, target, weight)
 
-            hist_target = cv2.calcHist(
-                [target], [i], None, [256], [0, 256])
-            cv2.normalize(hist_target, hist_target, alpha=0,
-                          beta=1, norm_type=cv2.NORM_MINMAX)
+                # build histgram
+                hist_transfer = cv2.calcHist(
+                    [img_trans], [i], None, [256], [0, 256])
+                cv2.normalize(hist_transfer, hist_transfer, alpha=0,
+                              beta=1, norm_type=cv2.NORM_MINMAX)
 
-            # compare histgram
-            trans_sou = cv2.compareHist(
-                hist_transfer, hist_source, cv2.HISTCMP_CORREL)
-            trans_tar = cv2.compareHist(
-                hist_transfer, hist_target, cv2.HISTCMP_CORREL)
-            # difference
-            diff = abs(trans_sou - trans_tar)
+                hist_source = cv2.calcHist(
+                    [source], [i], None, [256], [0, 256])
+                cv2.normalize(hist_source, hist_source, alpha=0,
+                              beta=1, norm_type=cv2.NORM_MINMAX)
 
-            #append in list
-            list_trans_sou.append(trans_sou)
-            list_trans_tar.append(trans_tar)
-            list_diff.append(diff)
+                hist_target = cv2.calcHist(
+                    [target], [i], None, [256], [0, 256])
+                cv2.normalize(hist_target, hist_target, alpha=0,
+                              beta=1, norm_type=cv2.NORM_MINMAX)
 
-        # write in excel file
-        excel_W(fun_name, col, list_trans_sou, list_trans_tar, list_diff, i_th)
-        # find out the best weight
-        list_best_wei.append(list_diff.index(min(list_diff)))
+                # compare histgram
+                trans_sou = cv2.compareHist(
+                    hist_transfer, hist_source, method)
+                trans_tar = cv2.compareHist(
+                    hist_transfer, hist_target, method)
+                # difference
+                diff = abs(trans_sou - trans_tar)
 
-    # build wct img
-    create_wctimg(source, target, list_best_wei, i_th)
+                #append in list
+                list_trans_sou.append(trans_sou)
+                list_trans_tar.append(trans_tar)
+                list_diff.append(diff)
+
+            # write in excel file
+            create_excel_csv(dir_name[j], fun_name[j], col, list_trans_sou,
+                             list_trans_tar, list_diff, i_th)
+            # find out the best weight
+            list_best_wei.append(list_diff.index(min(list_diff)))
+
+        # build wct img
+        create_wctimg(source, target, dir_name[j], list_best_wei, i_th)
 
 
-def excel_W(fun_name, color, trans_sou, trans_tar, diff, i_th):
+def create_excel_csv(dir_name, fun_name, color, trans_sou, trans_tar, diff, i_th):
 
-    dir_dis1 = "distance-COR/"
-    dir_path = dir_dis1 + "res-0" + str(i_th+1) + "-" + color + ".csv"
+    dir_dis = "distance-" + dir_name + "/"
+    dir_path = dir_dis + "res-0" + str(i_th+1) + "-dist-" + color + ".csv"
 
     with open(dir_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -153,10 +165,10 @@ def excel_W(fun_name, color, trans_sou, trans_tar, diff, i_th):
 
         for i in range(101):
             writer.writerow(
-                [(i+1), (0.01*i), trans_sou[i], trans_tar[i], diff[i]])
+                [(i+1), (0.01*i), round(trans_sou[i], 6), round(trans_tar[i], 6), round(diff[i], 6)])
 
 
-def create_wctimg(source, target, list_best_wei, i_th):
+def create_wctimg(source, target, dir_name, list_best_wei, i_th):
     # convert source and target to "float32"
     source = source.astype("float32")
     target = target.astype("float32")
@@ -203,16 +215,15 @@ def create_wctimg(source, target, list_best_wei, i_th):
     # transfer = cv2.cvtColor(transfer.astype("uint8"), cv2.COLOR_LAB2BGR)
 
     # create wct img
-    dir_awc1 = "awctresult-COR"
+    dir_awc = "awctresult-" + dir_name
 
-    path_name = dir_awc1 + "/res-0" + str(i_th+1) + '-' + \
+    path_name = dir_awc + "/res-0" + str(i_th+1) + '-' + \
         str(w_blue) + '-' + str(w_green) + '-' + str(w_red) + ".png"
     cv2.imwrite(path_name, wct_img)
 
 
 if __name__ == "__main__":
     dir_awc1 = "awctresult-COR"
-    dir_dis1 = "distance-COR/"
 
     entries = os.listdir(dir_awc1)
 
@@ -226,4 +237,4 @@ if __name__ == "__main__":
 
     for i in range(6):
         hist_dist(list[i], list[i+6], i)
-        print(i)
+        print(i+1)
