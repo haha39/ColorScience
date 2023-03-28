@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import csv
+import pandas as pd
 
 
 def color_transfer(source, target, diff, preserve_paper=True):
@@ -99,9 +100,9 @@ def hist_dist(source, target, i_th):
 
     dir_name = ["COR", "CHS", "INS", "BHA"]
 
-    list_best_wei = []
-
     for j, method in enumerate(hist_com):
+
+        list_best_wei = []
 
         for i, col in enumerate(color):
 
@@ -222,6 +223,28 @@ def create_wctimg(source, target, dir_name, list_best_wei, i_th):
     cv2.imwrite(path_name, wct_img)
 
 
+def csv_into_xlsx():
+
+    path_name = ('distance-COR/res-0', 'distance-CHS/res-0',
+                 'distance-INS/res-0', 'distance-BHA/res-0')
+
+    for i, name in enumerate(path_name):
+
+        for j in range(6):
+            writer = pd.ExcelWriter(name + str(j+1) + '-dist.xlsx')
+
+            data1 = pd.read_csv(name + str(j+1) +
+                                "-dist-blue.csv", encoding="utf-8")
+            data2 = pd.read_csv(name + str(j+1) +
+                                "-dist-green.csv", encoding="utf-8")
+            data3 = pd.read_csv(name + str(j+1) +
+                                "-dist-red.csv", encoding="utf-8")
+
+            data1.to_excel(writer, sheet_name='blue')
+            data2.to_excel(writer, sheet_name='green')
+            data3.to_excel(writer, sheet_name='red')
+
+
 if __name__ == "__main__":
     dir_awc1 = "awctresult-COR"
 
@@ -238,3 +261,5 @@ if __name__ == "__main__":
     for i in range(6):
         hist_dist(list[i], list[i+6], i)
         print(i+1)
+
+    csv_into_xlsx()
