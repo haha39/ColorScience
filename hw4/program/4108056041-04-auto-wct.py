@@ -115,7 +115,7 @@ def hist_dist(source, target, i_th):
             list_trans_tar = []
             list_diff = []
 
-            for weight in range(101):
+            for weight in range(20):
 
                 # build img_trans
                 img_trans = color_transfer(source, target, weight)
