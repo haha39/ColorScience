@@ -100,6 +100,11 @@ def hist_dist(source, target, i_th):
 
     dir_name = ["COR", "CHS", "INS", "BHA"]
 
+    '''
+    this design is not good enought, cause 'color_transfer()' cost the longest time,
+    in this case, we have to run color_transfer() 4 * 3 * 101 times, so we should
+    put this for loop outside to lower the excution time.
+    '''
     for j, method in enumerate(hist_com):
 
         list_best_wei = []
