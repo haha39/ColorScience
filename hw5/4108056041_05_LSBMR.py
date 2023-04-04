@@ -4,7 +4,7 @@ import os
 import random
 import math
 
-RATIO = 0.2
+RATIO = 0.20
 
 
 def lsb(num):
@@ -35,33 +35,27 @@ def rand(num):
 
 def lsbmr(secret_mes, cover_img):
 
-    print(cover_img.shape)
     h, w, c = cover_img.shape
 
     (b, g, r) = cv2.split(cover_img)
-    print(b.shape)
     b = b.flatten()
     g = g.flatten()
     r = r.flatten()
-
     list_color = (b, g, r)
-
-    # print("len")
-    # print(len(secret_mes))
-    # print(round(RATIO * len(secret_mes), 0))
 
     mes_len = int(RATIO * len(secret_mes))
 
     for color in list_color:
         for i in range(0, mes_len, 2):
-            if secret_mes[i] == lsb(color[i]):
-                if secret_mes[i+1] != func(color[i], color[i+1]):
+
+            if str(secret_mes[i]) == lsb(color[i]):
+                if str(secret_mes[i+1]) != func(color[i], color[i+1]):
                     color[i+1] = rand(color[i+1])
                 else:
                     color[i+1] = color[i+1]
                 color[i] = color[i]
             else:
-                if secret_mes[i+1] == func(color[i]-1, color[i+1]):
+                if str(secret_mes[i+1]) == func(color[i]-1, color[i+1]):
                     color[i] = color[i] - 1
                 else:
                     color[i] = color[i] + 1
@@ -70,18 +64,35 @@ def lsbmr(secret_mes, cover_img):
     b = b.reshape(h, w)
     g = g.reshape(h, w)
     r = r.reshape(h, w)
-    print(b.shape)
 
     transfer = cv2.merge([b, g, r])
 
     return transfer
 
 
+def check(secret_mes, embedding_img):
+
+    (b, g, r) = cv2.split(embedding_img)
+    b = b.flatten()
+    g = g.flatten()
+    r = r.flatten()
+    list_color = (b, g, r)
+
+    mes_len = int(RATIO * len(secret_mes))
+
+    for color in list_color:
+        for i in range(0, mes_len, 2):
+            if str(secret_mes[i]) != lsb(color[i]):
+                print("error! try again")
+            elif str(secret_mes[i+1]) != func(color[i], color[i+1]):
+                print("ko no dio da!!")
+
+
 if __name__ == "__main__":
 
     # initial variables
     dir_cover = "cover"
-    dir_stego = "stego"
+    dir_stego = "stego/"
     list = []
     list_name = []
 
@@ -90,14 +101,12 @@ if __name__ == "__main__":
 
     for entry in entries:
         img = cv2.imread(dir_cover + "/" + entry)
-        print(entry.replace(".png", ""))
 
         list.append(img)
         list_name.append(entry.replace(".png", ""))
 
     # embedding message with LSBMR
     for i in range(9):
-        print(i+1)
 
         # create secret message
         random.seed(100)
@@ -106,6 +115,11 @@ if __name__ == "__main__":
         secret_mes = np.full(mes_len, random.randint(0, 1))
 
         # LSBMR
-        lsbmr(secret_mes, list[i])
+        embedding_img = lsbmr(secret_mes, list[i])
+
+        # check
+        check(secret_mes, embedding_img)
 
         # create lsbmr img
+        path_name = dir_stego + list_name[i] + '_stego_' + str(RATIO) + ".png"
+        cv2.imwrite(path_name, embedding_img)
