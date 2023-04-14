@@ -113,6 +113,10 @@ if __name__ == "__main__":
         h, w, c = list[i].shape
         mes_len = h * w
         secret_mes = np.full(mes_len, random.randint(0, 1))
+        '''
+        random.seed(100)
+        secret_mes = [random.randint(0,1) for _ in range(int(mesg_size))]
+        '''
 
         # LSBMR
         embedding_img = lsbmr(secret_mes, list[i])
