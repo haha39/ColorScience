@@ -12,20 +12,25 @@ def cal_coordinate(sou_img):
     h, w, c = sou_img.shape
     pixels = h
 
-    list1 = []
+    this_img = []
 
     for i in range(h):
-        list2 = []
+        list1 = []
 
         for j in range(w):
-            list2.append([i, j])
+            list1.append([i, j])
 
-        list1.append(list2)
+        this_img.append(list1)
 
-    # print(list1)
+    new_img = []
 
-    this_img = list1
-    new_img = list1
+    for i in range(h):
+        list1 = []
+
+        for j in range(w):
+            list1.append([i, j])
+
+        new_img.append(list1)
 
     for i in range(G):
         for j in range(h):
@@ -38,7 +43,9 @@ def cal_coordinate(sou_img):
 
                 new_img[new_coordinate[0]][new_coordinate[1]] = this_img[j][k]
 
-        this_img = new_img
+    for a in range(2):
+        for b in range(2):
+            this_img[a][b] = new_img[a][b]
 
     return this_img
 
@@ -79,7 +86,6 @@ if __name__ == "__main__":
 
         print(i)
         print(list_name[i])
-        h, w, c = list[i].shape
 
         result_img = enc(list[i], transfer)
 
