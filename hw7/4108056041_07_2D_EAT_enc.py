@@ -8,7 +8,9 @@ M = np.array([[a*b+1, a],
 G = 100
 
 
-def cal_coordinate(sou_img):
+def cal_coordinate(sou_img):    # calcuate the corrdinate of 9 512*512 picture
+
+    # prepare
     h, w, c = sou_img.shape
     pixels = h
 
@@ -32,6 +34,7 @@ def cal_coordinate(sou_img):
 
         new_img.append(list1)
 
+    # EAT function
     for i in range(G):
         for j in range(h):
             for k in range(w):
@@ -43,23 +46,31 @@ def cal_coordinate(sou_img):
 
                 new_img[new_coordinate[0]][new_coordinate[1]] = this_img[j][k]
 
-    for a in range(2):
-        for b in range(2):
+    for a in range(h):
+        for b in range(w):
             this_img[a][b] = new_img[a][b]
 
     # print(this_img)
-
+    # the final coordinate after G times EAT function
     return this_img
 
 
-def enc(sou_img, transfer):
-    res_img = sou_img
+def enc(sou_img, transfer):  # to create the encrypt imgage
+
+    trans_img = []
 
     for j in range(512):
+        list1 = []
+
         for k in range(512):
-            res_img[j][k] = sou_img[transfer[j][k][0]][transfer[j][k][1]]
+
+            list1.append(sou_img[transfer[j][k][0]][transfer[j][k][1]])
             # print(i)
             # print(transfer[j][k][0])
+
+        trans_img.append(list1)
+
+    res_img = np.asarray(trans_img)
 
     return res_img
 
@@ -73,16 +84,19 @@ if __name__ == "__main__":
     list = []
     list_name = []
 
-    # read pic in test file
+    # read pic in source file
     entries = os.listdir(dir_sou)
 
     for entry in entries:
 
         img = cv2.imread(dir_sou + "/" + entry)
 
+        # get image
         list.append(img)
+        # get name
         list_name.append(entry.replace(".png", ""))
 
+    # calcuate the coordinate first
     transfer = cal_coordinate(list[0])
 
     # EAT enc
