@@ -93,7 +93,7 @@ if __name__ == "__main__":
         # get image
         list.append(img)
         # get name
-        list_name.append(entry.replace(".png", ""))
+        list_name.append(entry.replace("_enc.png", ""))
 
     # calcuate the coordinate first
     transfer = cal_coordinate(list[0])
