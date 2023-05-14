@@ -1,17 +1,18 @@
 import cv2
 import numpy as np
 import os
+import random
 
 a, b = 1, 1
-M = np.array([[a*b+1, a],
-              [b, 1]])
+M = np.array([[1, a],
+              [b, a*b+1]])
 G = 100
 
 
 def cal_coordinate(sou_img):    # calcuate the corrdinate of 9 512*512 picture
 
     # prepare
-    h, w, c = sou_img.shape
+    h, w = sou_img.shape
     pixels = h
 
     this_img = []
@@ -35,7 +36,7 @@ def cal_coordinate(sou_img):    # calcuate the corrdinate of 9 512*512 picture
         new_img.append(list1)
 
     # EAT function
-    
+
     for j in range(h):
         for k in range(w):
 
@@ -78,6 +79,7 @@ def enc(sou_img, transfer):  # to create the encrypt imgage
     return res_img
 
 
+'''
 if __name__ == "__main__":
 
     # initial variables
@@ -92,7 +94,7 @@ if __name__ == "__main__":
 
     for entry in entries:
 
-        img = cv2.imread(dir_sou + "/" + entry)
+        img = cv2.imread(dir_sou + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list.append(img)
@@ -113,3 +115,9 @@ if __name__ == "__main__":
         # create enc img
         path_name = dir_encryp + list_name[i] + "_enc.png"
         cv2.imwrite(path_name, result_img)
+
+'''
+ha = [0, 1, 2, 3, 4, 5, 6, 7]
+
+random.seed(100)
+print(random.sample(ha, k=8))   # [2, 5, 3, 4]
