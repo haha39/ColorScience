@@ -9,6 +9,45 @@ M = np.array([[1, a],
 G = 100
 
 
+def RP(pixel):
+
+    # step1 : turn dec itno bin
+    bin_pix = format(pixel, "b")
+    l = len(bin_pix)
+    j = 0
+
+    list_bin = np.zeros(8)
+
+    for i in range(8-l, 8, 1):
+
+        list_bin[i] = bin_pix[j]
+        j += 1
+
+    # step2 : shuffle
+    pos = [0, 1, 2, 3, 4, 5, 6, 7]
+
+    random.seed(100)
+    for i in range(8):
+        pos[i] = pos[i] % 100
+
+    shuffle_pos = random.sample(pos, k=8)
+
+    trans_bin = np.empty(8)
+
+    for i in range(8):
+        trans_bin[i] = list_bin[shuffle_pos[i]]
+
+    # steo3 : shuffle bin to dec
+    trans_pix = 0
+
+    for i in range(8):
+        trans_pix += trans_bin[i] * (2**(pos[7-i]))
+
+    trans_pix = int(trans_pix)
+
+    return trans_pix
+
+
 def cal_coordinate(sou_img):    # calcuate the corrdinate of 9 512*512 picture
 
     # prepare
@@ -68,7 +107,7 @@ def enc(sou_img, transfer):  # to create the encrypt imgage
 
         for k in range(512):
 
-            list1.append(sou_img[transfer[j][k][0]][transfer[j][k][1]])
+            list1.append(RP(sou_img[transfer[j][k][0]][transfer[j][k][1]]))
             # print(i)
             # print(transfer[j][k][0])
 
@@ -79,7 +118,6 @@ def enc(sou_img, transfer):  # to create the encrypt imgage
     return res_img
 
 
-'''
 if __name__ == "__main__":
 
     # initial variables
@@ -115,9 +153,3 @@ if __name__ == "__main__":
         # create enc img
         path_name = dir_encryp + list_name[i] + "_enc.png"
         cv2.imwrite(path_name, result_img)
-
-'''
-ha = [0, 1, 2, 3, 4, 5, 6, 7]
-
-random.seed(100)
-print(random.sample(ha, k=8))   # [2, 5, 3, 4]
