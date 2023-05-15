@@ -1,17 +1,58 @@
 import cv2
 import numpy as np
 import os
+import random
+
 
 a, b = 1, 1
-M = np.array([[1, -a],
-              [-b, a*b+1]])
+M = np.array([[a*b+1, -a],
+              [-b, 1]])
 G = 100
+
+
+def RP(pixel):
+
+    # step1 : turn dec itno bin
+    bin_pix = format(pixel, "b")
+    l = len(bin_pix)
+    j = 0
+
+    list_bin = np.zeros(8)
+
+    for i in range(8-l, 8, 1):
+
+        list_bin[i] = bin_pix[j]
+        j += 1
+
+    # step2 : shuffle
+    pos = [0, 1, 2, 3, 4, 5, 6, 7]
+
+    random.seed(100)
+    for i in range(8):
+        pos[i] = pos[i] % 100
+
+    shuffle_pos = random.sample(pos, k=8)
+
+    trans_trans_bin = np.empty(8)
+
+    for i in range(8):
+        trans_trans_bin[shuffle_pos[i]] = list_bin[i]
+
+    # steo3 : orginal bin to dec
+    trans_trans_pix = 0
+
+    for i in range(8):
+        trans_trans_pix += trans_trans_bin[i] * (2**(pos[7-i]))
+
+    trans_trans_pix = int(trans_trans_pix)
+
+    return trans_trans_pix
 
 
 def cal_coordinate(sou_img):    # calcuate the corrdinate of 9 512*512 picture
 
     # prepare
-    h, w, c = sou_img.shape
+    h, w = sou_img.shape
     pixels = h
 
     this_img = []
@@ -65,7 +106,7 @@ def enc(sou_img, transfer):  # to create the encrypt imgage
 
         for k in range(512):
 
-            list1.append(sou_img[transfer[j][k][0]][transfer[j][k][1]])
+            list1.append(RP(sou_img[transfer[j][k][0]][transfer[j][k][1]]))
             # print(i)
             # print(transfer[j][k][0])
 
@@ -90,7 +131,7 @@ if __name__ == "__main__":
 
     for entry in entries:
 
-        img = cv2.imread(dir_encryp + "/" + entry)
+        img = cv2.imread(dir_encryp + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list.append(img)
