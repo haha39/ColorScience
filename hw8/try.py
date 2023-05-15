@@ -86,4 +86,20 @@ for i in range(8):
     p += list4[i] * (2**(list1[7-i]))
 #     hoho += hehe[i] * (2**(l-i-1))
 p = int(p)
+print("enc")
 print(p)
+
+list5 = np.empty(8)
+
+for i in range(8):
+    list5[list3[i]] = list4[i]
+
+print("dec")
+
+number = 0
+
+for i in range(8):
+    number += list5[i] * (2**(list1[7-i]))
+
+number = int(number)
+print(number)
