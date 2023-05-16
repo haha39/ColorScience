@@ -10,7 +10,7 @@ M = np.array([[a*b+1, -a],
 G = 100
 
 
-def RP(pixel):
+def RRP(pixel):
 
     # step1 : turn dec itno bin
     bin_pix = format(pixel, "b")
@@ -97,7 +97,7 @@ def cal_coordinate(sou_img):    # calcuate the corrdinate of 9 512*512 picture
     return this_img
 
 
-def enc(sou_img, transfer):  # to create the encrypt imgage
+def dec(sou_img, transfer):  # to create the encrypt imgage
 
     trans_img = []
 
@@ -106,7 +106,7 @@ def enc(sou_img, transfer):  # to create the encrypt imgage
 
         for k in range(512):
 
-            list1.append(RP(sou_img[transfer[j][k][0]][transfer[j][k][1]]))
+            list1.append(RRP(sou_img[transfer[j][k][0]][transfer[j][k][1]]))
             # print(i)
             # print(transfer[j][k][0])
 
