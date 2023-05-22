@@ -30,6 +30,21 @@ def voh(img):
     return var_BGR
 
 
+def create_excel_csv(dir_name, fun_name, color, trans_sou, trans_tar, diff, i_th):
+
+    dir_dis = "distance-" + dir_name + "/"
+    dir_path = dir_dis + "res-0" + str(i_th+1) + "-dist-" + color + ".csv"
+
+    with open(dir_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([fun_name])
+        writer.writerow(["NO", "Weight", "D(S, Iw)", "D(T, Iw)", "Difference"])
+
+        for i in range(101):
+            writer.writerow(
+                [(i+1), (0.01*i), round(trans_sou[i], 6), round(trans_tar[i], 6), round(diff[i], 6)])
+
+
 if __name__ == "__main__":
 
     dir_sou = "source"
