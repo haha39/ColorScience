@@ -1,13 +1,15 @@
 import cv2
 import numpy as np
 import os
+import csv
 
 
 def voh(img):
 
-    var_BGR = []
+    var_RBG = np.array([0.0, 0.0, 0.0])
+    seq = [2, 1, 0]  # for sequence R G B
 
-    for color in range(3):
+    for color in seq:
 
         # build histgram
         hist_img = cv2.calcHist(
@@ -16,37 +18,40 @@ def voh(img):
                       beta=1, norm_type=cv2.NORM_MINMAX)
 
         # calculate the var of histogram
-        var = 0
+        var = 0.0
 
         for i in range(256):
             for j in range(256):
-                var = ((hist_img[i] - hist_img[j]) ** 2) / 2
+                var += ((hist_img[i] - hist_img[j]) ** 2) / 2
 
         var = var / 256
         var = var / 256
 
-        var_BGR.append(var)
+        var_RBG[color] = var
 
-    return var_BGR
+    print(var_RBG)
+    return var_RBG
 
 
-def create_excel_csv(dir_name, fun_name, color, trans_sou, trans_tar, diff, i_th):
+def create_csv(result_sou, result_enc, sou_name):
 
-    dir_dis = "distance-" + dir_name + "/"
-    dir_path = dir_dis + "res-0" + str(i_th+1) + "-dist-" + color + ".csv"
+    # dir_dis = "distance-" + dir_name + "/"
+    path = "statis/VOH_res.csv"
 
-    with open(dir_path, 'w', newline='') as csvfile:
+    with open(path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow([fun_name])
-        writer.writerow(["NO", "Weight", "D(S, Iw)", "D(T, Iw)", "Difference"])
+        writer.writerow(["VOH", "", "Plain", "", "", "Cipher"])
+        writer.writerow(["Image", "Type", "Red", "Green",
+                        "Blue", "Red", "Green", "Blue"])
 
-        for i in range(101):
-            writer.writerow(
-                [(i+1), (0.01*i), round(trans_sou[i], 6), round(trans_tar[i], 6), round(diff[i], 6)])
+        writer.writerow(
+            [sou_name, "color", result_sou[0], result_sou[1], result_sou[2],
+             result_enc[0], result_enc[1], result_enc[2]])
 
 
 if __name__ == "__main__":
 
+    # read pic in source file
     dir_sou = "source"
     list_sou = []
     list_sou_name = []
@@ -67,7 +72,7 @@ if __name__ == "__main__":
     list_encryp = []
     list_encryp_name = []
 
-    # read pic in source file
+    # read pic in encryp file
     entries = os.listdir(dir_encryp)
 
     for entry in entries:
@@ -80,17 +85,28 @@ if __name__ == "__main__":
         list_encryp_name.append(entry.replace(".png", ""))
 
     # calculate variance of histogram
+    res_sou = []
+    res_enc = []
+
     for i in range(9):
 
         print(i)
         print(list_sou_name[i])
-        print(list_encryp_name)
+        print(list_encryp_name[i])
 
-        result_sou = voh(list_sou[i])
-        result_enc = voh(list_encryp[i])
+        res_sou.append(voh(list_sou[i]))
+        res_enc.append(voh(list_encryp[i]))
 
-        csv要的是rgb喔
+    # create enc img
+    path = "statis/VOH_res.csv"
 
-        # # create enc img
-        # path_name = dir_encryp + list_name[i] + "_enc.png"
-        # cv2.imwrite(path_name, result_img)
+    with open(path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["VOH", "", "Plain", "", "", "Cipher"])
+        writer.writerow(["Image", "Type", "Red", "Green",
+                        "Blue", "Red", "Green", "Blue"])
+
+        for i in range(9):
+            writer.writerow(
+                [list_sou_name[i], "color", res_sou[i][0], res_sou[i][1], res_sou[i][2],
+                 res_enc[i][0], res_enc[i][1], res_enc[i][2]])
