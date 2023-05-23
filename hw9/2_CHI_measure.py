@@ -3,6 +3,7 @@ import numpy as np
 import os
 import csv
 from scipy.stats import chi2_contingency
+import matplotlib.pyplot as plt
 
 
 def chi(img_sou, img_enc):
@@ -19,19 +20,25 @@ def chi(img_sou, img_enc):
     cv2.normalize(hist_enc, hist_enc, alpha=0,
                   beta=1, norm_type=cv2.NORM_MINMAX)
 
+    # img_sou1 = img_sou.ravel()
+    # (hist_sou, a2, a3) = plt.hist(img_sou1, 256, [0, 256])
+
+    # img_enc1 = img_enc.ravel()
+    # (hist_enc, a2, a3) = plt.hist(img_enc1, 256, [0, 256])
+
     haha = 0.0
 
     for i in range(256):
-        tmp = hist_enc[i] - hist_sou[i]
-        tmp = tmp ** 2
-        tmp = tmp / hist_sou[i]
+        if hist_sou[i] != 0:
+            tmp = hist_enc[i] - hist_sou[i]
+            tmp = tmp ** 2
+            tmp = tmp / hist_sou[i]
 
-        haha += tmp
+            haha += tmp
 
     # chi, p, dof, expected = chi2_contingency([hist_sou, hist_enc])
 
     # print(chi)
-
     print(haha)
 
     return 0
