@@ -26,20 +26,21 @@ def chi(img_sou, img_enc):
     # img_enc1 = img_enc.ravel()
     # (hist_enc, a2, a3) = plt.hist(img_enc1, 256, [0, 256])
 
-    haha = 0.0
+    # haha = 0.0
+    # ei = 512*512/256
 
-    for i in range(256):
-        if hist_sou[i] != 0:
-            tmp = hist_enc[i] - hist_sou[i]
-            tmp = tmp ** 2
-            tmp = tmp / hist_sou[i]
+    # for i in range(256):
 
-            haha += tmp
+    #     tmp = hist_enc[i] - ei
+    #     tmp = tmp ** 2
+    #     tmp = tmp / ei
+    #     haha += tmp
 
-    # chi, p, dof, expected = chi2_contingency([hist_sou, hist_enc])
+    output = cv2.compareHist(
+        hist_sou, hist_enc, cv2.HISTCMP_CHISQR)
 
-    # print(chi)
-    print(haha)
+    print(output)
+    # print(haha)
 
     return 0
 
