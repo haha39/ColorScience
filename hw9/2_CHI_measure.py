@@ -1,37 +1,45 @@
 import cv2
 import numpy as np
 import os
+import csv
+from scipy.stats import chi2_contingency
 
 
-def voh(img):
+def chi(img_sou, img_enc):
 
-    var_BGR = []
+    # build histgram
+    hist_sou = cv2.calcHist(
+        [img_sou], [0], None, [256], [0, 256])
+    cv2.normalize(hist_sou, hist_sou, alpha=0,
+                  beta=1, norm_type=cv2.NORM_MINMAX)
 
-    for color in range(3):
+    # build histgram
+    hist_enc = cv2.calcHist(
+        [img_enc], [0], None, [256], [0, 256])
+    cv2.normalize(hist_enc, hist_enc, alpha=0,
+                  beta=1, norm_type=cv2.NORM_MINMAX)
 
-        # build histgram
-        hist_img = cv2.calcHist(
-            [img], [color], None, [256], [0, 256])
-        cv2.normalize(hist_img, hist_img, alpha=0,
-                      beta=1, norm_type=cv2.NORM_MINMAX)
+    haha = 0.0
 
-        # calculate the var of histogram
-        var = 0
+    for i in range(256):
+        tmp = hist_enc[i] - hist_sou[i]
+        tmp = tmp ** 2
+        tmp = tmp / hist_sou[i]
 
-        for i in range(256):
-            for j in range(256):
-                var = ((hist_img[i] - hist_img[j]) ** 2) / 2
+        haha += tmp
 
-        var = var / 256
-        var = var / 256
+    # chi, p, dof, expected = chi2_contingency([hist_sou, hist_enc])
 
-        var_BGR.append(var)
+    # print(chi)
 
-    return var_BGR
+    print(haha)
+
+    return 0
 
 
 if __name__ == "__main__":
 
+    # read pic in source file
     dir_sou = "source"
     list_sou = []
     list_sou_name = []
@@ -41,7 +49,7 @@ if __name__ == "__main__":
 
     for entry in entries:
 
-        img = cv2.imread(dir_sou + "/" + entry)
+        img = cv2.imread(dir_sou + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list_sou.append(img)
@@ -52,12 +60,12 @@ if __name__ == "__main__":
     list_encryp = []
     list_encryp_name = []
 
-    # read pic in source file
+    # read pic in encryp file
     entries = os.listdir(dir_encryp)
 
     for entry in entries:
 
-        img = cv2.imread(dir_encryp + "/" + entry)
+        img = cv2.imread(dir_encryp + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list_encryp.append(img)
@@ -65,17 +73,31 @@ if __name__ == "__main__":
         list_encryp_name.append(entry.replace(".png", ""))
 
     # calculate variance of histogram
+    res_sou = []
+    res_enc = []
+
     for i in range(9):
 
         print(i)
         print(list_sou_name[i])
-        print(list_encryp_name)
+        print(list_encryp_name[i])
 
-        result_sou = voh(list_sou[i])
-        result_enc = voh(list_encryp[i])
+        chi(list_sou[i], list_encryp[i])
 
-        csv要的是rgb喔
+        # res_sou.append(chi(list_sou[i]))
+        # res_enc.append(chi(list_encryp[i]))
+'''
+    # create enc img
+    path = "statis/VOH_res.csv"
 
-        # # create enc img
-        # path_name = dir_encryp + list_name[i] + "_enc.png"
-        # cv2.imwrite(path_name, result_img)
+    with open(path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["VOH", "", "Plain", "", "", "Cipher"])
+        writer.writerow(["Image", "Type", "Red", "Green",
+                        "Blue", "Red", "Green", "Blue"])
+
+        for i in range(9):
+            writer.writerow(
+                [list_sou_name[i], "color", res_sou[i][0], res_sou[i][1], res_sou[i][2],
+                 res_enc[i][0], res_enc[i][1], res_enc[i][2]])
+'''
