@@ -9,8 +9,7 @@ def voh(img):
     # build histgram
     hist_img = cv2.calcHist(
         [img], [0], None, [256], [0, 256])
-    cv2.normalize(hist_img, hist_img, alpha=0,
-                  beta=1, norm_type=cv2.NORM_MINMAX)
+    # cv2.normalize(hist_img, hist_img, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
     # calculate the var of histogram
     var = 0.0
@@ -73,6 +72,7 @@ if __name__ == "__main__":
 
         res_sou.append(voh(list_sou[i]))
         res_enc.append(voh(list_encryp[i]))
+
 '''
     # create enc img
     path = "statis/VOH_res.csv"
