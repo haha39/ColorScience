@@ -6,47 +6,24 @@ import csv
 
 def voh(img):
 
-    var_RBG = np.array([0.0, 0.0, 0.0])
-    seq = [2, 1, 0]  # for sequence R G B
+    # build histgram
+    hist_img = cv2.calcHist(
+        [img], [0], None, [256], [0, 256])
+    cv2.normalize(hist_img, hist_img, alpha=0,
+                  beta=1, norm_type=cv2.NORM_MINMAX)
 
-    for color in seq:
+    # calculate the var of histogram
+    var = 0.0
 
-        # build histgram
-        hist_img = cv2.calcHist(
-            [img], [color], None, [256], [0, 256])
-        cv2.normalize(hist_img, hist_img, alpha=0,
-                      beta=1, norm_type=cv2.NORM_MINMAX)
+    for i in range(256):
+        for j in range(256):
+            var += ((hist_img[i] - hist_img[j]) ** 2) / 2
 
-        # calculate the var of histogram
-        var = 0.0
+    var = var / 256
+    var = var / 256
 
-        for i in range(256):
-            for j in range(256):
-                var += ((hist_img[i] - hist_img[j]) ** 2) / 2
-
-        var = var / 256
-        var = var / 256
-
-        var_RBG[color] = var
-
-    print(var_RBG)
-    return var_RBG
-
-
-def create_csv(result_sou, result_enc, sou_name):
-
-    # dir_dis = "distance-" + dir_name + "/"
-    path = "statis/VOH_res.csv"
-
-    with open(path, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["VOH", "", "Plain", "", "", "Cipher"])
-        writer.writerow(["Image", "Type", "Red", "Green",
-                        "Blue", "Red", "Green", "Blue"])
-
-        writer.writerow(
-            [sou_name, "color", result_sou[0], result_sou[1], result_sou[2],
-             result_enc[0], result_enc[1], result_enc[2]])
+    print(var)
+    return var
 
 
 if __name__ == "__main__":
@@ -61,7 +38,7 @@ if __name__ == "__main__":
 
     for entry in entries:
 
-        img = cv2.imread(dir_sou + "/" + entry)
+        img = cv2.imread(dir_sou + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list_sou.append(img)
@@ -77,7 +54,7 @@ if __name__ == "__main__":
 
     for entry in entries:
 
-        img = cv2.imread(dir_encryp + "/" + entry)
+        img = cv2.imread(dir_encryp + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list_encryp.append(img)
@@ -96,7 +73,7 @@ if __name__ == "__main__":
 
         res_sou.append(voh(list_sou[i]))
         res_enc.append(voh(list_encryp[i]))
-
+'''
     # create enc img
     path = "statis/VOH_res.csv"
 
@@ -110,3 +87,4 @@ if __name__ == "__main__":
             writer.writerow(
                 [list_sou_name[i], "color", res_sou[i][0], res_sou[i][1], res_sou[i][2],
                  res_enc[i][0], res_enc[i][1], res_enc[i][2]])
+'''
