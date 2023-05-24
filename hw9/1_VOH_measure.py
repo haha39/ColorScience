@@ -9,19 +9,18 @@ def voh(img):
     # build histgram
     hist_img = cv2.calcHist(
         [img], [0], None, [256], [0, 256])
-    # cv2.normalize(hist_img, hist_img, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
     # calculate the var of histogram
     var = 0.0
 
     for i in range(256):
         for j in range(256):
-            var += ((hist_img[i] - hist_img[j]) ** 2) / 2
+            var += ((hist_img[i][0] - hist_img[j][0]) ** 2) / 2
 
     var = var / 256
     var = var / 256
 
-    print(var)
+    # print(var)
     return var
 
 
@@ -44,21 +43,21 @@ if __name__ == "__main__":
         # get name
         list_sou_name.append(entry.replace(".png", ""))
 
-    dir_encryp = "encryp"
-    list_encryp = []
-    list_encryp_name = []
-
     # read pic in encryp file
-    entries = os.listdir(dir_encryp)
+    dir_enc = "encryp"
+    list_enc = []
+    list_enc_name = []
+
+    entries = os.listdir(dir_enc)
 
     for entry in entries:
 
-        img = cv2.imread(dir_encryp + "/" + entry, cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(dir_enc + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
-        list_encryp.append(img)
+        list_enc.append(img)
         # get name
-        list_encryp_name.append(entry.replace(".png", ""))
+        list_enc_name.append(entry.replace(".png", ""))
 
     # calculate variance of histogram
     res_sou = []
@@ -68,13 +67,12 @@ if __name__ == "__main__":
 
         print(i)
         print(list_sou_name[i])
-        print(list_encryp_name[i])
+        print(list_enc_name[i])
 
         res_sou.append(voh(list_sou[i]))
-        res_enc.append(voh(list_encryp[i]))
+        res_enc.append(voh(list_enc[i]))
 
-'''
-    # create enc img
+    # create csv file
     path = "statis/VOH_res.csv"
 
     with open(path, 'w', newline='') as csvfile:
@@ -85,6 +83,5 @@ if __name__ == "__main__":
 
         for i in range(9):
             writer.writerow(
-                [list_sou_name[i], "color", res_sou[i][0], res_sou[i][1], res_sou[i][2],
-                 res_enc[i][0], res_enc[i][1], res_enc[i][2]])
-'''
+                [list_sou_name[i], "gray", res_sou[i], "", "",
+                 res_enc[i]])
