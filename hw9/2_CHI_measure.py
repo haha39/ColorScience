@@ -20,29 +20,12 @@ def chi(img_sou, img_enc):
     cv2.normalize(hist_enc, hist_enc, alpha=0,
                   beta=1, norm_type=cv2.NORM_MINMAX)
 
-    # img_sou1 = img_sou.ravel()
-    # (hist_sou, a2, a3) = plt.hist(img_sou1, 256, [0, 256])
-
-    # img_enc1 = img_enc.ravel()
-    # (hist_enc, a2, a3) = plt.hist(img_enc1, 256, [0, 256])
-
-    # haha = 0.0
-    # ei = 512*512/256
-
-    # for i in range(256):
-
-    #     tmp = hist_enc[i] - ei
-    #     tmp = tmp ** 2
-    #     tmp = tmp / ei
-    #     haha += tmp
-
     output = cv2.compareHist(
         hist_sou, hist_enc, cv2.HISTCMP_CHISQR)
 
     print(output)
-    # print(haha)
 
-    return 0
+    return output
 
 
 if __name__ == "__main__":
@@ -64,48 +47,43 @@ if __name__ == "__main__":
         # get name
         list_sou_name.append(entry.replace(".png", ""))
 
-    dir_encryp = "encryp"
-    list_encryp = []
-    list_encryp_name = []
-
     # read pic in encryp file
-    entries = os.listdir(dir_encryp)
+    dir_enc = "encryp"
+    list_enc = []
+    list_enc_name = []
+
+    entries = os.listdir(dir_enc)
 
     for entry in entries:
 
-        img = cv2.imread(dir_encryp + "/" + entry, cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(dir_enc + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
-        list_encryp.append(img)
+        list_enc.append(img)
         # get name
-        list_encryp_name.append(entry.replace(".png", ""))
+        list_enc_name.append(entry.replace(".png", ""))
 
-    # calculate variance of histogram
-    res_sou = []
-    res_enc = []
+    # calculate chi-square test of histogram
+    result = []
 
     for i in range(9):
 
         print(i)
         print(list_sou_name[i])
-        print(list_encryp_name[i])
+        print(list_enc_name[i])
 
-        chi(list_sou[i], list_encryp[i])
+        result.append(chi(list_sou[i], list_enc[i]))
 
-        # res_sou.append(chi(list_sou[i]))
-        # res_enc.append(chi(list_encryp[i]))
-'''
-    # create enc img
-    path = "statis/VOH_res.csv"
+    # create csv file
+    path = "statis/CHI_res.csv"
 
     with open(path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["VOH", "", "Plain", "", "", "Cipher"])
+        writer.writerow(["CHI", "", "Plain", "", "", "", "", "Cipher"])
         writer.writerow(["Image", "Type", "Red", "Green",
-                        "Blue", "Red", "Green", "Blue"])
+                        "Blue", "alpha", "chi value", "Red", "Green", "Blue"])
 
         for i in range(9):
             writer.writerow(
-                [list_sou_name[i], "color", res_sou[i][0], res_sou[i][1], res_sou[i][2],
-                 res_enc[i][0], res_enc[i][1], res_enc[i][2]])
-'''
+                [list_sou_name[i], "gray", "", "", "",
+                 "0.05", "293.248", result[i]])
