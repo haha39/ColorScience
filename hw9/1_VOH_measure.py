@@ -21,6 +21,8 @@ def voh(img):
     var = var / 256
 
     # print(var)
+    # print(np.var(hist_img))
+
     return var
 
 
