@@ -3,7 +3,6 @@ import numpy as np
 import os
 import csv
 from scipy.stats import chi2_contingency
-import matplotlib.pyplot as plt
 
 
 def chi(img_sou, img_enc):
@@ -23,7 +22,7 @@ def chi(img_sou, img_enc):
     output = cv2.compareHist(
         hist_sou, hist_enc, cv2.HISTCMP_CHISQR)
 
-    print(output)
+    # print(output)
 
     return output
 
