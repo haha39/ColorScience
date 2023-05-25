@@ -138,16 +138,18 @@ if __name__ == "__main__":
         # print(cor(list_enc[i]))
 
     # create csv file
-    path = "statis/CHI_res.csv"
+    path = "statis/COR_res.csv"
 
     with open(path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["CHI", "", "Plain", "", "", "", "", "Cipher"])
-        writer.writerow(["Image", "Type", "Red", "Green",
-                        "Blue", "alpha", "chi value", "Red", "Green", "Blue"])
-'''
+        writer.writerow(["COR", "", "Plain", "", "", "",
+                        "", "", "", "", "", "Cipher"])
+        writer.writerow(["Sample", "8000", "Red", "", "", "Green", "", "",
+                        "Blue", "", "",  "Red", "", "", "Green", "", "", "Blue", "", ""])
+        writer.writerow(["Image", "Type", "horizontal", "vertical", "diagonal", "horizontal", "vertical", "diagonal", "horizontal", "vertical",
+                        "diagonal", "horizontal", "vertical", "diagonal", "horizontal", "vertical", "diagonal", "horizontal", "vertical", "diagonal"])
+
         for i in range(9):
             writer.writerow(
-                [list_sou_name[i], "gray", "", "", "",
-                 "0.05", "293.248", result[i]])
-'''
+                [list_sou_name[i], "gray", res_sou[i][0], res_sou[i][1], res_sou[i][2], "", "", "",
+                 "", "", "", res_enc[i][0], res_enc[i][1], res_enc[i][2]])
