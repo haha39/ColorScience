@@ -46,10 +46,6 @@ def cor(img):
             y_dia.append(img[x-1][y-1])
 
     # calculate pearson's coefficients
-    # print(len(xi))
-    # print(len(y_hor))
-    # print(len(y_ver))
-    # print(len(y_dia))
 
     # step 1
     x_mean = np.mean(xi)
@@ -133,9 +129,6 @@ if __name__ == "__main__":
 
         res_sou.append(cor(list_sou[i]))
         res_enc.append(cor(list_enc[i]))
-
-        # print(cor(list_sou[i]))
-        # print(cor(list_enc[i]))
 
     # create csv file
     path = "statis/COR_res.csv"
