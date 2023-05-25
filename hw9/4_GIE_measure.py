@@ -1,37 +1,26 @@
 import cv2
 import numpy as np
 import os
+import csv
+from scipy.stats import entropy
 
 
-def voh(img):
+def gle(img):
 
-    var_BGR = []
+    # build histgram
+    hist_img = cv2.calcHist(
+        [img], [0], None, [256], [0, 256])
 
-    for color in range(3):
+    entropy_img = entropy(hist_img, base=2)
 
-        # build histgram
-        hist_img = cv2.calcHist(
-            [img], [color], None, [256], [0, 256])
-        cv2.normalize(hist_img, hist_img, alpha=0,
-                      beta=1, norm_type=cv2.NORM_MINMAX)
+    # print(entropy_img[0])
 
-        # calculate the var of histogram
-        var = 0
-
-        for i in range(256):
-            for j in range(256):
-                var = ((hist_img[i] - hist_img[j]) ** 2) / 2
-
-        var = var / 256
-        var = var / 256
-
-        var_BGR.append(var)
-
-    return var_BGR
+    return entropy_img[0]
 
 
 if __name__ == "__main__":
 
+    # read pic in source file
     dir_sou = "source"
     list_sou = []
     list_sou_name = []
@@ -41,41 +30,52 @@ if __name__ == "__main__":
 
     for entry in entries:
 
-        img = cv2.imread(dir_sou + "/" + entry)
+        img = cv2.imread(dir_sou + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
         list_sou.append(img)
         # get name
         list_sou_name.append(entry.replace(".png", ""))
 
-    dir_encryp = "encryp"
-    list_encryp = []
-    list_encryp_name = []
+    # read pic in encryp file
+    dir_enc = "encryp"
+    list_enc = []
+    list_enc_name = []
 
-    # read pic in source file
-    entries = os.listdir(dir_encryp)
+    entries = os.listdir(dir_enc)
 
     for entry in entries:
 
-        img = cv2.imread(dir_encryp + "/" + entry)
+        img = cv2.imread(dir_enc + "/" + entry, cv2.IMREAD_GRAYSCALE)
 
         # get image
-        list_encryp.append(img)
+        list_enc.append(img)
         # get name
-        list_encryp_name.append(entry.replace(".png", ""))
+        list_enc_name.append(entry.replace(".png", ""))
 
     # calculate variance of histogram
+    res_sou = []
+    res_enc = []
+
     for i in range(9):
 
         print(i)
         print(list_sou_name[i])
-        print(list_encryp_name)
+        print(list_enc_name[i])
 
-        result_sou = voh(list_sou[i])
-        result_enc = voh(list_encryp[i])
+        res_sou.append(gle(list_sou[i]))
+        res_enc.append(gle(list_enc[i]))
 
-        csv要的是rgb喔
+    # create csv file
+    path = "statis/GLE_res.csv"
 
-        # # create enc img
-        # path_name = dir_encryp + list_name[i] + "_enc.png"
-        # cv2.imwrite(path_name, result_img)
+    with open(path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["GLE", "", "Plain", "", "", "Cipher"])
+        writer.writerow(["Image", "Type", "Red", "Green",
+                        "Blue", "Red", "Green", "Blue"])
+
+        for i in range(9):
+            writer.writerow(
+                [list_sou_name[i], "gray", res_sou[i], "", "",
+                 res_enc[i]])
